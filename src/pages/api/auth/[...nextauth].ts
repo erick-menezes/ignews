@@ -50,7 +50,43 @@ export const authOptions = {
         return false;
       }
 
-    }, 
+    },
+    async session({ session }) {
+      try {
+        const userActiveSubscription = await fauna.query(
+          q.Get(
+            q.Intersection([
+              q.Match(
+                q.Index('subscription_by_user_ref'),
+                q.Select(
+                  "ref",
+                  q.Get(
+                    q.Match(
+                      q.Index('users_by_email'),
+                      q.Casefold(session.user.email)
+                    )
+                  )
+                )
+              ),
+              q.Match(
+                q.Index('subscription_by_status'),
+                "active"
+              )
+            ])
+          )
+        );
+
+        return {
+          ...session,
+          activeSubscription: userActiveSubscription,
+        };
+      } catch (error) {
+        return {
+          ...session,
+          activeSubscription: null,
+        };
+      }
+    },
   }
 }
 
