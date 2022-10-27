@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GithubProvider from "next-auth/providers/github"
 
 import { fauna } from '../../../services/fauna';
@@ -7,7 +7,7 @@ import { query as q } from 'faunadb';
 // TODO later
 // https://next-auth.js.org/configuration/options#secret
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
@@ -87,7 +87,8 @@ export const authOptions = {
         };
       }
     },
-  }
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 }
 
 export default NextAuth(authOptions)
